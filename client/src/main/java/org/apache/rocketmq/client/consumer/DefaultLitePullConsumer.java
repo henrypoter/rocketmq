@@ -413,7 +413,6 @@ public class DefaultLitePullConsumer extends ClientConfig implements LitePullCon
     public void setMessageQueueListener(MessageQueueListener messageQueueListener) {
         this.messageQueueListener = messageQueueListener;
     }
-
     public long getConsumerPullTimeoutMillis() {
         return consumerPullTimeoutMillis;
     }
@@ -462,4 +461,5 @@ public class DefaultLitePullConsumer extends ClientConfig implements LitePullCon
     public void setConsumeTimestamp(String consumeTimestamp) {
         this.consumeTimestamp = consumeTimestamp;
     }
+
 }

@@ -86,7 +86,7 @@ public class DefaultLitePullConsumerTest {
     private OffsetStore offsetStore;
     private DefaultLitePullConsumerImpl litePullConsumerImpl;
     private String consumerGroup = "LitePullConsumerGroup";
-    private String topic = "LitePullConsumerTest";
+    private String topic = "sync-topic";
     private String brokerName = "BrokerA";
     private boolean flag = false;
 
@@ -535,7 +535,7 @@ public class DefaultLitePullConsumerTest {
 
     private DefaultLitePullConsumer createStartLitePullConsumer() throws Exception {
         DefaultLitePullConsumer litePullConsumer = new DefaultLitePullConsumer(consumerGroup + System.currentTimeMillis());
-        litePullConsumer.setNamesrvAddr("127.0.0.1:9876");
+        litePullConsumer.setNamesrvAddr("192.168.11.180:9876");
         litePullConsumer.start();
         initDefaultLitePullConsumer(litePullConsumer);
         return litePullConsumer;

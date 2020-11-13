@@ -26,16 +26,19 @@
     <packaging>jar</packaging>
     <artifactId>rocketmq-client</artifactId>
     <name>rocketmq-client ${project.version}</name>
+    <version>4.6.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
+        <project.version>4.6.1</project.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>rocketmq-common</artifactId>
+            <version>4.6.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>

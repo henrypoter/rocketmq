@@ -89,6 +89,10 @@ public class DefaultLitePullConsumerImpl implements MQConsumerInner {
 
     private OffsetStore offsetStore;
 
+    /**
+     * Message queue listener
+     */
+    private MessageQueueListener messageQueueListenerInner = new MessageQueueListenerImpl();
     private RebalanceImpl rebalanceImpl = new RebalanceLitePullImpl(this);
 
     private enum SubscriptionType {
@@ -193,17 +197,33 @@ public class DefaultLitePullConsumerImpl implements MQConsumerInner {
     }
 
     class MessageQueueListenerImpl implements MessageQueueListener {
+
         @Override
         public void messageQueueChanged(String topic, Set<MessageQueue> mqAll, Set<MessageQueue> mqDivided) {
             MessageModel messageModel = defaultLitePullConsumer.getMessageModel();
+            MessageQueueListener messageQueueListener = defaultLitePullConsumer.getMessageQueueListener();
             switch (messageModel) {
                 case BROADCASTING:
                     updateAssignedMessageQueue(topic, mqAll);
                     updatePullTask(topic, mqAll);
+                    if(null != messageQueueListener){
+                        try {
+                            messageQueueListener.messageQueueChanged(topic,mqAll,mqDivided);
+                        } catch (Throwable e) {
+                            log.error("messageQueueChanged exception", e);
+                        }
+                    }
                     break;
                 case CLUSTERING:
                     updateAssignedMessageQueue(topic, mqDivided);
                     updatePullTask(topic, mqDivided);
+                    if(null != messageQueueListener){
+                        try {
+                            messageQueueListener.messageQueueChanged(topic,mqAll,mqDivided);
+                        } catch (Throwable e) {
+                            log.error("messageQueueChanged exception", e);
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -431,7 +451,6 @@ public class DefaultLitePullConsumerImpl implements MQConsumerInner {
             SubscriptionData subscriptionData = FilterAPI.buildSubscriptionData(defaultLitePullConsumer.getConsumerGroup(),
                 topic, subExpression);
             this.rebalanceImpl.getSubscriptionInner().put(topic, subscriptionData);
-            this.defaultLitePullConsumer.setMessageQueueListener(new MessageQueueListenerImpl());
             assignedMessageQueue.setRebalanceImpl(this.rebalanceImpl);
             if (serviceState == ServiceState.RUNNING) {
                 this.mQClientFactory.sendHeartbeatToAllBrokerWithLock();
@@ -455,7 +474,6 @@ public class DefaultLitePullConsumerImpl implements MQConsumerInner {
             SubscriptionData subscriptionData = FilterAPI.build(topic,
                 messageSelector.getExpression(), messageSelector.getExpressionType());
             this.rebalanceImpl.getSubscriptionInner().put(topic, subscriptionData);
-            this.defaultLitePullConsumer.setMessageQueueListener(new MessageQueueListenerImpl());
             assignedMessageQueue.setRebalanceImpl(this.rebalanceImpl);
             if (serviceState == ServiceState.RUNNING) {
                 this.mQClientFactory.sendHeartbeatToAllBrokerWithLock();
@@ -1064,5 +1082,9 @@ public class DefaultLitePullConsumerImpl implements MQConsumerInner {
 
     public void setPullTimeDelayMillsWhenException(long pullTimeDelayMillsWhenException) {
         this.pullTimeDelayMillsWhenException = pullTimeDelayMillsWhenException;
+    }
+
+    public MessageQueueListener getMessageQueueListenerInner() {
+        return messageQueueListenerInner;
     }
 }
